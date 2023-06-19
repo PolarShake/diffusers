@@ -511,7 +511,13 @@ class TextualInversionDataset(Dataset):
             "lanczos": PIL_INTERPOLATION["lanczos"],
         }[interpolation]
 
-        self.templates = imagenet_style_templates_small if learnable_property == "style" else imagenet_templates_small
+        if learnable_property == "style":
+            self.templates = imagenet_style_templates_small
+        elif learnable_property == "object":
+            self.templates = imagenet_templates_small
+        else:
+            self.templates = None
+
         self.flip_transform = transforms.RandomHorizontalFlip(p=self.flip_p)
 
     def __len__(self):
@@ -527,13 +533,16 @@ class TextualInversionDataset(Dataset):
             image = image.convert("RGB")
 
         placeholder_string = self.placeholder_token
-        #text = random.choice(self.templates).format(placeholder_string)
-
-        caption=''.join([i for i in image_name if not i.isdigit()])
-        caption=caption.replace("_"," ")
-        caption=caption.replace("(","")
-        caption=caption.replace(")","")
-        caption=caption.replace("-","")
+        
+        if self.templates is not None:
+            text = random.choice(self.templates).format(placeholder_string)
+        else:    
+            caption=''.join([i for i in image_name if not i.isdigit()])
+            caption=caption.replace("_"," ")
+            caption=caption.replace("(","")
+            caption=caption.replace(")","")
+            caption=caption.replace("-","")
+            text = caption.format(placeholder_string) 
 
         text = caption.format(placeholder_string) 
 
