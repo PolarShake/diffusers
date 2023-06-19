@@ -543,9 +543,7 @@ class TextualInversionDataset(Dataset):
             caption=caption.replace(")","")
             caption=caption.replace("-","")
             text = caption.format(placeholder_string) 
-
-        text = caption.format(placeholder_string) 
-
+            
         example["input_ids"] = self.tokenizer(
             text,
             padding="max_length",
